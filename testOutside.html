@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 600px;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    ul {
+      width: 100%;
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    li {
+      font-size: 36px;
+      background-color: #a236f6;
+      color: #fff;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      text-align: center;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .active1 {
+      background-color: #771bbd;
+    }
+
+    .active2 {
+      background-color: #ce9cf5;
+    }
+
+    .btns {
+      margin-top: 20px;
+    }
+
+    button {
+      width: 100%;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+
+    .words {
+      margin-top: 20px;
+    }
+  </style>
+  <title>List Item Manipulator</title>
+</head>
+
+<body>
+  <div class="container">
+    <ul>
+      <li data-n="1">1</li>
+      <li data-n="1">2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+      <li>6</li>
+      <li>7</li>
+      <li>8</li>
+      <li>9</li>
+      <li>10</li>
+    </ul>
+    <div class="btns">
+      <input name="put" type="radio" id="after" value="after" checked><label for="after">放到指定的後面</label>
+      <input name="put" type="radio" id="before" value="before"><label for="before">放到指定的前面</label>
+      <input name="put" type="radio" id="switch" value="switch"><label for="switch">交換</label>
+    </div>
+  </div>
+
+  <script>
+    // 建立一個變數 selectAry，類型為陣列，用來記錄點選的內容
+    let selectAry = []; 
+    // 對 li 綁定 click 事件
+    $("ul").on("click", "li" ,e => {
+      if(selectAry.length < 2){
+        selectAry.push($(e.currentTarget).index()); // 點了後就把點擊的物件的索引值 .index() 放入陣列當中
+        console.log(selectAry);
+        $(e.currentTarget).addClass("active"+selectAry.length); // 用 selectAry 中的個數來限制點的個數
+        if(selectAry.length == 2){ // 當 selectAry 等於 2，就把 selectAry 記錄清空，active 樣式清空，重新進行點擊
+          // 做動作
+          switch($("input[type=radio]:checked").val()){ // 根據選中的 radio 按鈕，會執行不同的操作
+            case "before":
+              // .eq() 去指定第一個被點的，用 .eq(selectAry[1]) 找到目前，再用 .before() 把小括號中的內容放到目標前
+              $("li").eq(selectAry[0]).before($("li").eq(selectAry[1]));
+              break;
+            case "after":
+             // 用 .eq(selectAry[1]) 找到目前，再用 .after() 把小括號中的內容放到目標後
+              $("li").eq(selectAry[0]).after($("li").eq(selectAry[1]));
+              break;
+            case "switch":
+              // 當選項是 switch 時，就是互相交換，會用 .replaceWith() 這個方法來做
+              selectAry.sort(); // 用.sort() 把陣列排序一下，這樣不管哪個先哪個後點，數字小的都會被放在前面
+              console.log(selectAry);
+              let item0 = $("li").eq(selectAry[0]).clone();
+              let item1 = $("li").eq(selectAry[1]).clone();
+              $("li").eq(selectAry[0]).replaceWith(item1);
+              $("li").eq(selectAry[1]).replaceWith(item0);
+              break;
+          }
+          // 恢復原狀
+          // 點完馬上清空，第二個會沒有感覺有被點到，所以用 setTimeour() 這個計時器，在 1 秒後才清空記錄，重置動作
+          setTimeout(() => {
+            selectAry = [];
+            $(".active1").removeClass("active1");
+            $(".active2").removeClass("active2");
+          }, 1000);
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
